@@ -1,37 +1,62 @@
+require "values"
 require "delfos/neo4j"
 
 require "delfos/neo4j_analysis/version"
 require "delfos/neo4j_analysis/method_definition_argument_parser"
 
+
 module Delfos
   module Neo4jAnalysis
-    CodeLocation = Struct.new(:file, :line_number)
+    CallSite = Value.new("file", "line_number")
+    Method   = Value.new("file", "line_number", "klass", "name", "type")
 
     def self.call_sites(short_hand)
-      params = MethodDefinitionArgumentParser.parse short_hand
+      CallSiteFetcher.new(short_hand).fetch
+    end
 
-      results = Neo4j.execute_sync <<-QUERY, params
-        MATCH (:Class{name: {klass_name}})
-          -[:OWNS]->
-        (:Method{name:{method_name}, type:{method_type}})
+    class CallSiteFetcher
+      def initialize(short_hand)
+        @short_hand = short_hand
+      end
 
-        <-[:CALLS]-(call_site:CallSite)
-        <-[:CONTAINS]-(container_method:Method)
-        <-[:OWNS]-(container_klass:Class)
+      def fetch
+        results.map{|r| parse(*r)}
+      end
+
+      private
+
+      def parse(call_site_attrs, method_attrs, klass_attrs)
+        call_site        = CallSite.with(call_site_attrs)
+        container_method = method_from(method_attrs, klass_attrs)
+
+        [container_method, call_site]
+      end
 
 
+      def method_from(method_attrs, klass_attrs)
+        method_attrs = method_attrs.merge("klass" => klass_attrs["name"])
+        Method.with(method_attrs)
+      end
 
-        RETURN call_site, container_method, container_klass
-      QUERY
+      def results
+        Neo4j.execute_sync <<-QUERY, params
+          MATCH (:Class{name: {klass_name}})
+            -[:OWNS]->
+          (:Method{name:{method_name}, type:{method_type}})
 
-      factory = Delfos::MethodTrace::CodeLocation
+          <-[:CALLS]-(call_site:CallSite)
+          <-[:CONTAINS]-(container_method:Method)
+          <-[:OWNS]-(container_klass:Class)
 
-      results.map do |call_site_attrs, container_method_attrs, container_klass_attrs|
-        container_method_attrs
 
+          RETURN call_site, container_method, container_klass
+        QUERY
+      end
 
-        [container_method.summary, call_site.summary]
+      def params
+        MethodDefinitionArgumentParser.parse @short_hand
       end
     end
+
   end
 end
