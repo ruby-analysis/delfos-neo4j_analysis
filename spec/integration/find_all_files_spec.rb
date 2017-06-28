@@ -10,6 +10,10 @@ RSpec.describe do
     Delfos::Neo4jAnalysis::CallSite.with(attrs.stringify_keys)
   end
 
+  before do
+    Delfos.configure
+  end
+
   let(:expected) do
     [
       [

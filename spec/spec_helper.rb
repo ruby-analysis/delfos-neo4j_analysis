@@ -1,4 +1,5 @@
 require "byebug"
+require "delfos/neo4j_analysis"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -24,3 +25,11 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand config.seed
 end
+
+
+
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+::Dir.glob(::File.expand_path('../support/*.rb', __FILE__)).each { |f| require_relative f }
+::Dir.glob(::File.expand_path('../support/**/*.rb', __FILE__)).each { |f| require_relative f }
