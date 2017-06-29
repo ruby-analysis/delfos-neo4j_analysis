@@ -2,11 +2,11 @@
 module Delfos
   module Neo4jAnalysis
     class MethodListing
-      def self.perform(klass_name, path_prefix)
-        new.perform(klass_name, path_prefix).join("\n")
+      def self.perform(klass_name)
+        new.perform(klass_name).join("\n")
       end
 
-      def perform(klass_name, path_prefix)
+      def perform(klass_name)
         results = results(klass_name)
 
         max_length = results.map(&:first).map(&:length).sort.last
@@ -14,7 +14,7 @@ module Delfos
         results.map do |name, file, line_number|
           name = name.ljust(max_length, " ")
 
-          "#{name}  #{path_prefix}#{file}:#{line_number}"
+          "#{name}  #{Cli.path_prefix}#{file}:#{line_number}"
         end.sort.uniq
       end
 

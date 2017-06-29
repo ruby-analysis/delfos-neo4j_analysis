@@ -1,66 +1,10 @@
 #!/usr/bin/env ruby
-require "highline"
 require "byebug"
 
 $:.unshift File.expand_path("../../lib", __FILE__)
-require "delfos/neo4j_analysis"
+require "delfos/neo4j_analysis/cli"
 
-PREFIX = ARGV[0] || ""
+path_prefix = ARGV[0] || ""
+port = ENV["NEO4J_PORT"] || "8001"
 
-ENV["NEO4J_PORT"] ||= "8001"
-
-def cli
-  @cli ||= HighLine.new
-end
-
-module CallSites
-  def self.perform
-    short_hand = cli.ask("Enter a method to search for: e.g. Product#name"){ |q| q.default = "Bundler.ui" }
-    cli.say "Searching for #{short_hand}"
-    call_sites(short_hand)
-  end
-
-  def self.call_sites(short_hand)
-    call_sites = Delfos::Neo4jAnalysis.call_sites(short_hand)
-    cli.say call_sites.map{|c| "#{PREFIX}#{c}"}.join("\n")
-  end
-end
-
-cli.choose do |menu|
-  menu.prompt = "Choose an action"
-  menu.choice("Find call sites") { CallSites.perform }
-
-  menu.choice("List application classes" ) { cli.say Delfos::Neo4jAnalysis.list_classes }
-
-  menu.choice("List all classes") do
-    cli.say Delfos::Neo4jAnalysis.list_all_classes
-  end
-
-  menu.choice("List methods") do
-    klass = cli.ask("Enter a Class")
-    cli.say Delfos::Neo4jAnalysis.list_methods(klass, PREFIX)
-  end
-
-  menu.choice("Random execution chain") do
-    chain = Delfos::Neo4jAnalysis.execution_chain(path_prefix: PREFIX)
-    cli.say chain.source
-    finish = false
-
-    until finish
-      command = cli.ask("Step (s), Up (u), Quit (q)? "){ |c| %w(s u q).include?(c) }
-
-      case command
-      when "s"
-        cli.say chain.next
-      when "u"
-        cli.say chain.previous
-      when "q"
-        finish = true
-      end
-    end
-  end
-
-  menu.choice("Exit") { exit 0 }
-  menu.default = "List application classes"
-  #menu.choice(:exeuction_chain) { cli.say "Execution chain" }
-end until false
+Delfos::Neo4jAnalysis::Cli.start(port, path_prefix)

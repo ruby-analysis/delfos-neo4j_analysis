@@ -3,20 +3,19 @@
 Tools to make the Delfos recorded graph data more easily accessible.
 
 
-## Usage (work in progress)
+## Usage
 
 ```
-$ delfos_analysis
-Choose an option
----------------
-1. Find call sites for a single method
-2. Step through an execution chain
-3. List most heavily coupled classes with large file system distances
-
-> 1
-Enter Class & method e.g. `Product#name' or `Bundler.configure'
-> Product#name
-app/controllers/users_controller.rb:73
-app/models/product_search.rb:14
-app/models/user.rb:987
+bundle exec delfos_analysis ../application_directory
+1. Find call sites
+2. Find methods which eventually call a method
+3. List application classes
+4. List all classes
+5. List methods
+6. Random execution chain
+7. Exit
+ 
 ```
+
+
+

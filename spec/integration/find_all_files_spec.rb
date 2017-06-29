@@ -1,6 +1,5 @@
 require "spec_helper"
 require "delfos/neo4j_analysis"
-require "active_support/core_ext/string"
 
 RSpec.describe do
   def new_method(attrs)
