@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-require "byebug"
 
 $:.unshift File.expand_path("../../lib", __FILE__)
 require "delfos/neo4j_analysis/cli"

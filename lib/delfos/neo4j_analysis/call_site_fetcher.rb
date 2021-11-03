@@ -15,9 +15,9 @@ module Delfos
 
       def results
         Neo4j.execute_sync <<-QUERY, params
-          MATCH (:Class{name: {klass_name}})
+          MATCH (:Class{name: $klass_name})
             -[:OWNS]->
-          (:Method{name:{method_name}, type:{method_type}})
+          (:Method{name: $method_name, type: $method_type})
 
           <-[:CALLS]-(call_site:CallSite)
           <-[:CONTAINS]-(container_method:Method)

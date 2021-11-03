@@ -179,7 +179,7 @@ module Delfos
 
       def results
         Neo4j.execute_sync <<-QUERY, params
-          MATCH (cs:CallStack{uuid: {uuid}})-[step:STEP]->(call_site)
+          MATCH (cs:CallStack{uuid: $uuid})-[step:STEP]->(call_site)
           <-[:CONTAINS]-(container:Method)<-[:OWNS]-(container_class:Class),
 
           (call_site)-[:CALLS]->(called:Method)<-[:OWNS]-(called_class:Class)

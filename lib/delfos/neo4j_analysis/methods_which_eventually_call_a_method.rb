@@ -6,7 +6,7 @@ module Delfos
       def self.perform(short_hand)
         new(short_hand).perform
       end
-      
+
       def initialize(short_hand)
         @short_hand = short_hand
       end
@@ -19,9 +19,9 @@ module Delfos
 
       def results
         Neo4j.execute_sync <<-QUERY, params
-          MATCH (:Class{name: {klass_name}})
+          MATCH (:Class{name: $klass_name})
             -[:OWNS]->
-          (:Method{name:{method_name}, type:{method_type}})
+          (:Method{name:$method_name, type:$method_type})
           <-[:CALLS]-(call_site:CallSite)<-[call_step:STEP]-(call_stack:CallStack),
 
           (call_stack)-[previous_step:STEP]->(previous_call_site:CallSite)

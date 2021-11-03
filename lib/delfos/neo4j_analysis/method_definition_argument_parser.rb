@@ -14,8 +14,8 @@ module Delfos
       def parse
         {
           klass_name: klass_name,
-         method_type: method_type,
-         method_name: method_name
+          method_type: method_type,
+          method_name: method_name
         }
       end
 

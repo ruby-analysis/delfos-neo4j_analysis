@@ -29,7 +29,7 @@ module Delfos
               -[:CONTAINS] -> (cs:CallSite),
 
             (m)
-              <-[:OWNS]- (Class{name: {klass_name}})
+              <-[:OWNS]- (Class{name: $klass_name})
 
           RETURN m.name, m.file, m.line_number
           ORDER BY m.name
